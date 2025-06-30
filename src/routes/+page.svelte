@@ -755,6 +755,12 @@
     max-width: 90vw;
     display: block;
   }
+  @media (max-width: 400px) {
+    .countdown {
+      gap: 0.1rem;
+    }
+
+  }
 </style>
 
 
