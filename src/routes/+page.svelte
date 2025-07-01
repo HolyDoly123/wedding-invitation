@@ -61,14 +61,15 @@
   let rsvpLoading = false;
   let rsvpError = '';
   let appearAtCeremony = false;
+  let appearAtBanket = false;
 
   async function sendRSVP(name: string) {
     rsvpLoading = true;
     rsvpError = '';
     try {
       // Placeholder Telegram bot URL
-      const url1 = `https://api.telegram.org/bot8189926925:AAFpLohjTEIjtBwavVozi5bPODy8nKxTdtg/sendMessage?chat_id=1787011904&text=${encodeURIComponent(name)} приняли приглашение! Дети - ${bringingChildren}; В загсе - ${appearAtCeremony}`
-      const url2 = `https://api.telegram.org/bot8189926925:AAFpLohjTEIjtBwavVozi5bPODy8nKxTdtg/sendMessage?chat_id=351234630&text=${encodeURIComponent(name)} приняли приглашение! Дети - ${bringingChildren}; В загсе - ${appearAtCeremony}`
+      const url1 = `https://api.telegram.org/bot8189926925:AAFpLohjTEIjtBwavVozi5bPODy8nKxTdtg/sendMessage?chat_id=1787011904&text=${encodeURIComponent(name)} приняли приглашение! Дети - ${bringingChildren}; В загсе - ${appearAtCeremony}; Сразу на банкет - ${appearAtBanket}`
+      const url2 = `https://api.telegram.org/bot8189926925:AAFpLohjTEIjtBwavVozi5bPODy8nKxTdtg/sendMessage?chat_id=351234630&text=${encodeURIComponent(name)} приняли приглашение! Дети - ${bringingChildren}; В загсе - ${appearAtCeremony} Сразу на банкет - ${appearAtBanket}`
       await fetch(url1);
       await fetch(url2);
       rsvpSent = true;
@@ -134,7 +135,7 @@
     {
       title: 'О поздравлении',
       img: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=400&q=80', // микрофон/аплодисменты
-      desc: 'Мы поощряем ваше творчество, поэтому будем рады вашему творческому подходу к поздравлению! Все заготовки просим согласовать с Заводилой'
+      desc: 'Мы поощряем ваше творчество, поэтому будем рады вашему творческому подходу к поздравлению! Все заготовки просим согласовать с Решалой'
     }
   ];
 
@@ -179,6 +180,10 @@
   const showCeremony = derived(page, ($page) => {
     const params = new URLSearchParams($page.url.search);
     return !!params.get('ceremony');
+  });
+  const showBanket = derived(page, ($page) => {
+    const params = new URLSearchParams($page.url.search);
+    return !!params.get('banket');
   });
 
   // Функция для правильных окончаний (русский)
@@ -851,21 +856,26 @@
       <div class="font-bold text-purple-500 text-2xl sm:text-3xl mt-2">24.07.2025</div>
     </div>
     <div class="checkboxes-center flex justify-center w-full mx-auto max-w-xs">
-      <div class="checkboxes flex flex-col gap-3 items-start justify-center" class:mt-4={$showChildren || $showCeremony}>
+      <div class="checkboxes flex flex-col gap-3 items-start justify-center" class:mt-4={$showChildren || $showCeremony || $showBanket}>
         {#if $showChildren}
           <label class="flex items-center gap-2 text-base font-medium text-gray-800 cursor-pointer p-2 rounded-lg hover:bg-purple-50">
-            <input type="checkbox" bind:checked={bringingChildren} class="accent-purple-500 w-5 h-5 rounded" /> Приду с детьми
+            <input type="checkbox" bind:checked={bringingChildren} class="accent-purple-500 w-5 h-5 rounded" /> Придем с детьми
           </label>
         {/if}
         {#if $showCeremony}
           <label class="flex items-center gap-2 text-base font-medium text-gray-800 cursor-pointer p-2 rounded-lg hover:bg-purple-50">
-            <input type="checkbox" bind:checked={appearAtCeremony} class="accent-purple-500 w-5 h-5 rounded" /> Буду на церемонии
+            <input type="checkbox" bind:checked={appearAtCeremony} class="accent-purple-500 w-5 h-5 rounded" /> Буду(-ем) на церемонии
+          </label>
+        {/if}
+        {#if $showBanket}
+          <label class="flex items-center gap-2 text-base font-medium text-gray-800 cursor-pointer p-2 rounded-lg hover:bg-purple-50">
+            <input type="checkbox" bind:checked={appearAtBanket} class="accent-purple-500 w-5 h-5 rounded" /> Буду(-ем) сразу на банкете
           </label>
         {/if}
       </div>
     </div>
     {#if !rsvpSent}
-      <div class="flex justify-center" class:mt-6={$showChildren || $showCeremony} class:mt-1={!$showChildren && !$showCeremony}>
+      <div class="flex justify-center" class:mt-6={$showChildren || $showCeremony || $showBanket} class:mt-1={!$showChildren && !$showCeremony && !$showBanket}>
         <button class="rsvp-btn bg-gradient-to-r from-indigo-500 to-blue-400 text-white text-lg px-8 py-3 rounded-full font-semibold shadow hover:scale-105 transition-transform" bind:this={rsvpButton} on:click={() => $guestName && sendRSVP($guestName)} disabled={rsvpLoading}>
           {rsvpLoading ? 'Отправка...' : 'Подтвердить участие'}
         </button>
@@ -888,7 +898,7 @@
       </div>
       <div class="mb-2 flex items-center gap-2">
         <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="#10b981"/></svg>
-        <a href="https://t.me/realnormalno" class="text-gray-800 underline">Заводила</a>
+        <a href="https://t.me/realnormalno" class="text-gray-800 underline">Решала</a>
       </div>
     </div>
   </section>
