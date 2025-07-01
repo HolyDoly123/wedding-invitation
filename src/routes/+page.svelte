@@ -10,7 +10,7 @@
   // Get guest name from URL param
   const guestName = derived(page, ($page) => {
     const params = new URLSearchParams($page.url.search);
-    return params.get('guest') || 'Dear Guest';
+    return params.get('guest') || 'Расхитители адресной строки';
   });
 
   // Determine greeting based on guestName
